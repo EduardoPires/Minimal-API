@@ -93,12 +93,7 @@ app.Run();
 
 void MapActions(WebApplication app)
 {
-    app.MapGet("/", () => "Hello World!").ExcludeFromDescription();
-
-    app.MapGet("user/fornecedor/sapato/aviao", () => "Hello World!")
-        .WithName("TesteDoido")
-        .WithTags("Teste")
-        .ExcludeFromDescription();
+    app.MapGet("/", () => "Hello World!").ExcludeFromDescription();    
 
     app.MapPost("/registro", [AllowAnonymous] async (
         SignInManager<IdentityUser> signInManager,
@@ -107,7 +102,7 @@ void MapActions(WebApplication app)
         RegisterUser registerUser) =>
     {
         if (registerUser == null)
-            return Results.BadRequest("Usuário não informado");
+            return Results.BadRequest("UsuÃ¡rio nÃ£o informado");
 
         if (!MiniValidator.TryValidate(registerUser, out var errors))
             return Results.ValidationProblem(errors);
@@ -148,7 +143,7 @@ void MapActions(WebApplication app)
         LoginUser loginUser) =>
     {
         if (loginUser == null)
-            return Results.BadRequest("Usuário não informado");
+            return Results.BadRequest("UsuÃ¡rio nÃ£o informado");
 
         if (!MiniValidator.TryValidate(loginUser, out var errors))
             return Results.ValidationProblem(errors);
@@ -156,10 +151,10 @@ void MapActions(WebApplication app)
         var result = await signInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, true);
 
         if (result.IsLockedOut)
-            return Results.BadRequest("Usuário bloqueado");
+            return Results.BadRequest("UsuÃ¡rio bloqueado");
 
         if (!result.Succeeded)
-            return Results.BadRequest("Usuário ou senha inválidos");
+            return Results.BadRequest("UsuÃ¡rio ou senha invÃ¡lidos");
 
         var jwt = new JwtBuilder()
                     .WithUserManager(userManager)
@@ -181,7 +176,7 @@ void MapActions(WebApplication app)
     app.MapGet("/fornecedor", [AllowAnonymous] async (
         MinimalContextDb context) =>
         await context.Fornecedores.ToListAsync())
-        .WithName("GetFornecedores")
+        .WithName("GetFornecedor")
         .WithTags("Fornecedor");
 
     app.MapGet("/fornecedor/{id}", [Authorize] async (
@@ -193,7 +188,7 @@ void MapActions(WebApplication app)
                   : Results.NotFound())        
         .Produces<Fornecedor>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
-        .WithName("GetFornecedoresPorId")
+        .WithName("GetFornecedorPorId")
         .WithTags("Fornecedor");
 
     app.MapPost("/fornecedor", [Authorize] async (
@@ -208,7 +203,7 @@ void MapActions(WebApplication app)
 
         return result > 0
             //? Results.Created($"/fornecedor/{fornecedor.Id}", fornecedor)
-            ? Results.CreatedAtRoute("GetFornecedoresPorId", new { id = fornecedor.Id }, fornecedor)
+            ? Results.CreatedAtRoute("GetFornecedorPorId", new { id = fornecedor.Id }, fornecedor)
             : Results.BadRequest("Houve um problema ao salvar o registro");
 
     }).ProducesValidationProblem()
